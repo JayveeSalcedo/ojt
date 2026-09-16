@@ -24,9 +24,11 @@ type Props = {
   mode: "today" | "past";
   /** Called after any change is saved (so parents can refresh totals/lists). */
   onChange?: () => void;
+  /** Called after the whole entry is deleted. */
+  onDelete?: () => void;
 };
 
-export default function EntryEditor({ student, date, mode, onChange }: Props) {
+export default function EntryEditor({ student, date, mode, onChange, onDelete }: Props) {
   const [entry, setEntry] = useState<Entry | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [narrative, setNarrative] = useState("");
@@ -165,6 +167,24 @@ export default function EntryEditor({ student, date, mode, onChange }: Props) {
       toast("Narrative saved");
     });
 
+  const deleteEntry = async () => {
+    if (!entry) return;
+    const ok = await confirm({ title: "Delete Entry?", message: "This day's time log, photos, and narrative will be permanently removed.", confirmText: "Delete", destructive: true });
+    if (!ok) return;
+    await run("delete", async () => {
+      if (photos.length) await supabase.storage.from("photos").remove(photos.map((p) => p.storage_path));
+      const { error } = await supabase.from("entries").delete().eq("id", entry.id);
+      if (error) throw error;
+      setEntry(null);
+      setPhotos([]);
+      setNarrative("");
+      setAi(null);
+      onChange?.();
+      onDelete?.();
+      toast("Entry deleted");
+    });
+  };
+
   if (!loaded) return <EntrySkeleton />;
 
   const showTimeFields = !isToday || editTimes;
@@ -251,6 +271,12 @@ export default function EntryEditor({ student, date, mode, onChange }: Props) {
           </div>
         )}
       </section>
+
+      {entry && (
+        <button className="btn btn-ghost w-full !text-red-500" disabled={!!busy} onClick={deleteEntry}>
+          {busy === "delete" ? "Deleting…" : "Delete Entry"}
+        </button>
+      )}
     </div>
   );
 }

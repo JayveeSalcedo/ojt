@@ -156,7 +156,7 @@ export default function Journal() {
               <button className="w-16 text-right text-[16px] font-semibold text-brand-2" onClick={closeEditor}>Done</button>
             </div>
             <div className="overflow-y-auto p-4" style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 24px)" }}>
-              <EntryEditor student={student} date={editing} mode="past" />
+              <EntryEditor student={student} date={editing} mode="past" onDelete={closeEditor} />
             </div>
           </div>
         </div>
