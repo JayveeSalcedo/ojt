@@ -80,11 +80,13 @@ export default function EntryEditor({ student, date, mode, onChange, onDelete }:
     setBusy("");
   };
 
-  const upload = (files: FileList | null) =>
-    run("upload", async () => {
-      if (!files?.length) return;
+  const upload = (fileList: FileList | null) => {
+    // Copy now: FileList is live and gets emptied when the input is reset.
+    const files = Array.from(fileList ?? []);
+    return run("upload", async () => {
+      if (!files.length) return;
       const e = await ensureEntry();
-      for (const f of Array.from(files)) {
+      for (const f of files) {
         const blob = await compressImage(f);
         const path = `${student.id}/${date}/${crypto.randomUUID()}.jpg`;
         const up = await supabase.storage.from("photos").upload(path, blob, { contentType: "image/jpeg" });
@@ -99,6 +101,7 @@ export default function EntryEditor({ student, date, mode, onChange, onDelete }:
       onChange?.();
       toast(files.length > 1 ? `${files.length} photos uploaded` : "Photo uploaded");
     });
+  };
 
   const removePhoto = async (p: Photo) => {
     const ok = await confirm({ title: "Delete Photo?", message: "This photo will be permanently removed.", confirmText: "Delete", destructive: true });
