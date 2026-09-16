@@ -59,7 +59,7 @@ export default function Journal() {
           <p className="font-semibold">Log a past day</p>
           <p className="muted text-sm">Catch up on days from before you started using the app.</p>
           <div className="mt-3 flex gap-2">
-            <input type="date" className="field min-w-0 flex-1 !py-2" max={yesterdayISO()} value={pastDate} onChange={(e) => setPastDate(e.target.value)} />
+            <input suppressHydrationWarning type="date" className="field min-w-0 flex-1 !py-2" max={yesterdayISO()} value={pastDate} onChange={(e) => setPastDate(e.target.value)} />
             <button className="btn btn-blue shrink-0 !py-2" disabled={!pastDate || !student} onClick={() => setEditing(pastDate)}>
               Log Day
             </button>

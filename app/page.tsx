@@ -48,7 +48,7 @@ export default function PickName() {
       <TopBar title="Who are you?" subtitle="Welcome" />
       <div className="mx-auto max-w-2xl px-4">
         <p className="muted mb-4 text-[15px]">Choose your name to start tracking your 486 OJT hours.</p>
-        <input className="field mb-4" placeholder="Search name" value={q} onChange={(e) => setQ(e.target.value)} />
+        <input suppressHydrationWarning className="field mb-4" placeholder="Search name" value={q} onChange={(e) => setQ(e.target.value)} />
         {error && <p className="mb-3 text-sm text-red-500">{error}</p>}
         <div className="card sep overflow-hidden">
           {loading &&
