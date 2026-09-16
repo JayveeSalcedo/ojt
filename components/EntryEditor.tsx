@@ -89,9 +89,13 @@ export default function EntryEditor({ student, date, mode, onChange, onDelete }:
         const path = `${student.id}/${date}/${crypto.randomUUID()}.jpg`;
         const up = await supabase.storage.from("photos").upload(path, blob, { contentType: "image/jpeg" });
         if (up.error) throw up.error;
-        await supabase.from("photos").insert({ entry_id: e.id, storage_path: path });
+        const { data: row, error } = await supabase.from("photos").insert({ entry_id: e.id, storage_path: path }).select().single();
+        if (error) {
+          await supabase.storage.from("photos").remove([path]);
+          throw error;
+        }
+        setPhotos((ps) => [...ps, row as Photo]);
       }
-      await load();
       onChange?.();
       toast(files.length > 1 ? `${files.length} photos uploaded` : "Photo uploaded");
     });

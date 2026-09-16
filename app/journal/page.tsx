@@ -111,6 +111,12 @@ export default function Journal() {
                         <div className="min-w-0 flex-1">
                           <p className="font-medium">{fmtDate(e.date, { weekday: "long" })}</p>
                           <p className="muted truncate text-sm">{e.narrative_ai || e.narrative_raw || "No narrative"}</p>
+                          {!isOpen && ps.length > 0 && (
+                            <div className="mt-1.5 flex items-center gap-1">
+                              {ps.slice(0, 4).map((p) => <img key={p.id} src={photoUrl(p.storage_path)} alt="" loading="lazy" className="h-9 w-9 rounded-lg object-cover" />)}
+                              {ps.length > 4 && <span className="muted ml-1 text-xs font-medium">+{ps.length - 4}</span>}
+                            </div>
+                          )}
                         </div>
                         <span className="rounded-full bg-sun/30 px-2 py-0.5 text-xs font-semibold tabular-nums">{Number(e.hours).toFixed(1)}h</span>
                       </button>
