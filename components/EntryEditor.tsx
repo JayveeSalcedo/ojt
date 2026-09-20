@@ -10,10 +10,13 @@ function toLocalInput(ts: string | null) {
   const d = new Date(ts);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
-function fromLocalInput(date: string, hhmm: string) {
+function fromLocalInput(date: string, hhmm: string, kind?: "in" | "out") {
   if (!hhmm) return null;
   const [y, m, d] = date.split("-").map(Number);
-  const [h, mi] = hhmm.split(":").map(Number);
+  let [h, mi] = hhmm.split(":").map(Number);
+  // Force Time In → AM, Time Out → PM
+  if (kind === "in" && h >= 12) h -= 12;
+  if (kind === "out" && h < 12) h += 12;
   return new Date(y, m - 1, d, h, mi).toISOString();
 }
 
@@ -213,8 +216,8 @@ export default function EntryEditor({ student, date, mode, onChange, onDelete }:
         </div>
         {showTimeFields ? (
           <div key={`${date}-${entry?.id ?? "new"}`} className="mt-3 grid grid-cols-3 gap-2">
-            <label className="muted text-xs">In<input type="time" className="field mt-1" defaultValue={toLocalInput(entry?.time_in ?? null)} onBlur={(e) => { const v = fromLocalInput(date, e.target.value); if (v !== (entry?.time_in ?? null)) editTime({ time_in: v }); }} /></label>
-            <label className="muted text-xs">Out<input type="time" className="field mt-1" defaultValue={toLocalInput(entry?.time_out ?? null)} onBlur={(e) => { const v = fromLocalInput(date, e.target.value); if (v !== (entry?.time_out ?? null)) editTime({ time_out: v }); }} /></label>
+            <label className="muted text-xs">In<input type="time" className="field mt-1" defaultValue={toLocalInput(entry?.time_in ?? null)} onBlur={(e) => { const v = fromLocalInput(date, e.target.value, "in"); if (v !== (entry?.time_in ?? null)) editTime({ time_in: v }); }} /></label>
+            <label className="muted text-xs">Out<input type="time" className="field mt-1" defaultValue={toLocalInput(entry?.time_out ?? null)} onBlur={(e) => { const v = fromLocalInput(date, e.target.value, "out"); if (v !== (entry?.time_out ?? null)) editTime({ time_out: v }); }} /></label>
             <label className="muted text-xs">Break (min)<input type="number" min={0} className="field mt-1" defaultValue={entry?.break_minutes ?? 60} onBlur={(e) => { const v = Number(e.target.value) || 0; if (v !== (entry?.break_minutes ?? 60)) editTime({ break_minutes: v }); }} /></label>
           </div>
         ) : (
