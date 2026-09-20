@@ -6,7 +6,7 @@ import ProgressRing from "@/components/ProgressRing";
 import EntryEditor, { EntrySkeleton } from "@/components/EntryEditor";
 import { supabase } from "@/lib/supabase";
 import { useStudent } from "@/lib/useStudent";
-import { fmtDate, todayISO } from "@/lib/hours";
+import { fmtDate, todayISO, estimateEndDate } from "@/lib/hours";
 import { Skeleton } from "@/components/UI";
 
 export default function Today() {
@@ -33,6 +33,9 @@ export default function Today() {
               <p className="text-[15px] font-semibold">{student.name}</p>
               <div><p className="muted text-xs uppercase">Rendered</p><p className="text-2xl font-bold tabular-nums">{total.toFixed(2)} h</p></div>
               <div><p className="muted text-xs uppercase">Remaining</p><p className="text-lg font-semibold tabular-nums text-brand-2">{Math.max(0, student.required_hours - total).toFixed(2)} h</p></div>
+              {student.required_hours - total > 0 && (
+                <div><p className="muted text-xs uppercase">Est. End Date</p><p className="text-[15px] font-semibold tabular-nums">{estimateEndDate(student.required_hours - total).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p></div>
+              )}
             </div>
           </section>
         ) : (

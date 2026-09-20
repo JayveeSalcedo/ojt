@@ -48,3 +48,16 @@ export function groupWeeks(entries: Entry[], startDate: string | null): Week[] {
   }
   return [...map.values()].sort((a, b) => a.number - b.number);
 }
+
+/** Estimate the completion date assuming 8 h/day, 5 days/week (Mon–Fri). */
+export function estimateEndDate(remainingHours: number): Date {
+  const HRS_PER_DAY = 8;
+  let daysNeeded = Math.ceil(remainingHours / HRS_PER_DAY);
+  const d = new Date();
+  while (daysNeeded > 0) {
+    d.setDate(d.getDate() + 1);
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) daysNeeded--; // skip Sat & Sun
+  }
+  return d;
+}
